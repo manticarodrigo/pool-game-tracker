@@ -1,11 +1,10 @@
-type Post {
+type Game {
   id: ID! @unique
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean! @default(value: "false")
   title: String!
-  text: String!
-  author: User!
+  players: [User!]! @relation(name: "GamesJoined")
+  winner: User @relation(name: "GamesWon")
 }
 
 type User {
@@ -13,5 +12,6 @@ type User {
   email: String! @unique
   password: String!
   name: String!
-  posts: [Post!]!
+  gamesJoined: [Game!]! @relation(name: "GamesJoined")
+  gamesWon: [Game!]! @relation(name: "GamesWon")
 }

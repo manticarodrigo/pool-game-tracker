@@ -1,7 +1,7 @@
 # source: https://us1.prisma.sh/public-chocolateiguana-404/pool-game-tracking/dev
-# timestamp: Thu Jul 26 2018 13:48:45 GMT-0400 (EDT)
+# timestamp: Thu Jul 26 2018 14:58:09 GMT-0400 (EDT)
 
-type AggregatePost {
+type AggregateGame {
   count: Int!
 }
 
@@ -16,141 +16,94 @@ type BatchPayload {
 
 scalar DateTime
 
-"""
-The `Long` scalar type represents non-fractional signed whole numeric values.
-Long can represent values between -(2^63) and 2^63 - 1.
-"""
-scalar Long
-
-type Mutation {
-  createPost(data: PostCreateInput!): Post!
-  createUser(data: UserCreateInput!): User!
-  updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  deletePost(where: PostWhereUniqueInput!): Post
-  deleteUser(where: UserWhereUniqueInput!): User
-  upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyPosts(data: PostUpdateInput!, where: PostWhereInput): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
-  deleteManyPosts(where: PostWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
-}
-
-enum MutationType {
-  CREATED
-  UPDATED
-  DELETED
-}
-
-"""An object with an ID"""
-interface Node {
-  """The id of the object."""
-  id: ID!
-}
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: String
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: String
-}
-
-type Post implements Node {
+type Game implements Node {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean!
   title: String!
-  text: String!
-  author(where: UserWhereInput): User!
+  players(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  winner(where: UserWhereInput): User
 }
 
 """A connection to a list of items."""
-type PostConnection {
+type GameConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [PostEdge]!
-  aggregate: AggregatePost!
+  edges: [GameEdge]!
+  aggregate: AggregateGame!
 }
 
-input PostCreateInput {
-  isPublished: Boolean
+input GameCreateInput {
   title: String!
-  text: String!
-  author: UserCreateOneWithoutPostsInput!
+  players: UserCreateManyWithoutGamesJoinedInput
+  winner: UserCreateOneWithoutGamesWonInput
 }
 
-input PostCreateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
+input GameCreateManyWithoutPlayersInput {
+  create: [GameCreateWithoutPlayersInput!]
+  connect: [GameWhereUniqueInput!]
 }
 
-input PostCreateWithoutAuthorInput {
-  isPublished: Boolean
+input GameCreateManyWithoutWinnerInput {
+  create: [GameCreateWithoutWinnerInput!]
+  connect: [GameWhereUniqueInput!]
+}
+
+input GameCreateWithoutPlayersInput {
   title: String!
-  text: String!
+  winner: UserCreateOneWithoutGamesWonInput
+}
+
+input GameCreateWithoutWinnerInput {
+  title: String!
+  players: UserCreateManyWithoutGamesJoinedInput
 }
 
 """An edge in a connection."""
-type PostEdge {
+type GameEdge {
   """The item at the end of the edge."""
-  node: Post!
+  node: Game!
 
   """A cursor for use in pagination."""
   cursor: String!
 }
 
-enum PostOrderByInput {
+enum GameOrderByInput {
   id_ASC
   id_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
-  isPublished_ASC
-  isPublished_DESC
   title_ASC
   title_DESC
-  text_ASC
-  text_DESC
 }
 
-type PostPreviousValues {
+type GamePreviousValues {
   id: ID!
   createdAt: DateTime!
   updatedAt: DateTime!
-  isPublished: Boolean!
   title: String!
-  text: String!
 }
 
-type PostSubscriptionPayload {
+type GameSubscriptionPayload {
   mutation: MutationType!
-  node: Post
+  node: Game
   updatedFields: [String!]
-  previousValues: PostPreviousValues
+  previousValues: GamePreviousValues
 }
 
-input PostSubscriptionWhereInput {
+input GameSubscriptionWhereInput {
   """Logical AND on all given filters."""
-  AND: [PostSubscriptionWhereInput!]
+  AND: [GameSubscriptionWhereInput!]
 
   """Logical OR on all given filters."""
-  OR: [PostSubscriptionWhereInput!]
+  OR: [GameSubscriptionWhereInput!]
 
   """Logical NOT on all given filters combined by AND."""
-  NOT: [PostSubscriptionWhereInput!]
+  NOT: [GameSubscriptionWhereInput!]
 
   """
   The subscription event gets dispatched when it's listed in mutation_in
@@ -171,51 +124,74 @@ input PostSubscriptionWhereInput {
   The subscription event gets only dispatched when some of the field names included in this list have been updated
   """
   updatedFields_contains_some: [String!]
-  node: PostWhereInput
+  node: GameWhereInput
 }
 
-input PostUpdateInput {
-  isPublished: Boolean
+input GameUpdateInput {
   title: String
-  text: String
-  author: UserUpdateOneWithoutPostsInput
+  players: UserUpdateManyWithoutGamesJoinedInput
+  winner: UserUpdateOneWithoutGamesWonInput
 }
 
-input PostUpdateManyWithoutAuthorInput {
-  create: [PostCreateWithoutAuthorInput!]
-  connect: [PostWhereUniqueInput!]
-  disconnect: [PostWhereUniqueInput!]
-  delete: [PostWhereUniqueInput!]
-  update: [PostUpdateWithWhereUniqueWithoutAuthorInput!]
-  upsert: [PostUpsertWithWhereUniqueWithoutAuthorInput!]
+input GameUpdateManyWithoutPlayersInput {
+  create: [GameCreateWithoutPlayersInput!]
+  connect: [GameWhereUniqueInput!]
+  disconnect: [GameWhereUniqueInput!]
+  delete: [GameWhereUniqueInput!]
+  update: [GameUpdateWithWhereUniqueWithoutPlayersInput!]
+  upsert: [GameUpsertWithWhereUniqueWithoutPlayersInput!]
 }
 
-input PostUpdateWithoutAuthorDataInput {
-  isPublished: Boolean
+input GameUpdateManyWithoutWinnerInput {
+  create: [GameCreateWithoutWinnerInput!]
+  connect: [GameWhereUniqueInput!]
+  disconnect: [GameWhereUniqueInput!]
+  delete: [GameWhereUniqueInput!]
+  update: [GameUpdateWithWhereUniqueWithoutWinnerInput!]
+  upsert: [GameUpsertWithWhereUniqueWithoutWinnerInput!]
+}
+
+input GameUpdateWithoutPlayersDataInput {
   title: String
-  text: String
+  winner: UserUpdateOneWithoutGamesWonInput
 }
 
-input PostUpdateWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  data: PostUpdateWithoutAuthorDataInput!
+input GameUpdateWithoutWinnerDataInput {
+  title: String
+  players: UserUpdateManyWithoutGamesJoinedInput
 }
 
-input PostUpsertWithWhereUniqueWithoutAuthorInput {
-  where: PostWhereUniqueInput!
-  update: PostUpdateWithoutAuthorDataInput!
-  create: PostCreateWithoutAuthorInput!
+input GameUpdateWithWhereUniqueWithoutPlayersInput {
+  where: GameWhereUniqueInput!
+  data: GameUpdateWithoutPlayersDataInput!
 }
 
-input PostWhereInput {
+input GameUpdateWithWhereUniqueWithoutWinnerInput {
+  where: GameWhereUniqueInput!
+  data: GameUpdateWithoutWinnerDataInput!
+}
+
+input GameUpsertWithWhereUniqueWithoutPlayersInput {
+  where: GameWhereUniqueInput!
+  update: GameUpdateWithoutPlayersDataInput!
+  create: GameCreateWithoutPlayersInput!
+}
+
+input GameUpsertWithWhereUniqueWithoutWinnerInput {
+  where: GameWhereUniqueInput!
+  update: GameUpdateWithoutWinnerDataInput!
+  create: GameCreateWithoutWinnerInput!
+}
+
+input GameWhereInput {
   """Logical AND on all given filters."""
-  AND: [PostWhereInput!]
+  AND: [GameWhereInput!]
 
   """Logical OR on all given filters."""
-  OR: [PostWhereInput!]
+  OR: [GameWhereInput!]
 
   """Logical NOT on all given filters combined by AND."""
-  NOT: [PostWhereInput!]
+  NOT: [GameWhereInput!]
   id: ID
 
   """All values that are not equal to given value."""
@@ -300,10 +276,6 @@ input PostWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
-  isPublished: Boolean
-
-  """All values that are not equal to given value."""
-  isPublished_not: Boolean
   title: String
 
   """All values that are not equal to given value."""
@@ -344,59 +316,70 @@ input PostWhereInput {
 
   """All values not ending with the given string."""
   title_not_ends_with: String
-  text: String
-
-  """All values that are not equal to given value."""
-  text_not: String
-
-  """All values that are contained in given list."""
-  text_in: [String!]
-
-  """All values that are not contained in given list."""
-  text_not_in: [String!]
-
-  """All values less than the given value."""
-  text_lt: String
-
-  """All values less than or equal the given value."""
-  text_lte: String
-
-  """All values greater than the given value."""
-  text_gt: String
-
-  """All values greater than or equal the given value."""
-  text_gte: String
-
-  """All values containing the given string."""
-  text_contains: String
-
-  """All values not containing the given string."""
-  text_not_contains: String
-
-  """All values starting with the given string."""
-  text_starts_with: String
-
-  """All values not starting with the given string."""
-  text_not_starts_with: String
-
-  """All values ending with the given string."""
-  text_ends_with: String
-
-  """All values not ending with the given string."""
-  text_not_ends_with: String
-  author: UserWhereInput
+  players_every: UserWhereInput
+  players_some: UserWhereInput
+  players_none: UserWhereInput
+  winner: UserWhereInput
 }
 
-input PostWhereUniqueInput {
+input GameWhereUniqueInput {
   id: ID
 }
 
+"""
+The `Long` scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
+type Mutation {
+  createGame(data: GameCreateInput!): Game!
+  createUser(data: UserCreateInput!): User!
+  updateGame(data: GameUpdateInput!, where: GameWhereUniqueInput!): Game
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteGame(where: GameWhereUniqueInput!): Game
+  deleteUser(where: UserWhereUniqueInput!): User
+  upsertGame(where: GameWhereUniqueInput!, create: GameCreateInput!, update: GameUpdateInput!): Game!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  updateManyGames(data: GameUpdateInput!, where: GameWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  deleteManyGames(where: GameWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
+}
+
+enum MutationType {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+"""An object with an ID"""
+interface Node {
+  """The id of the object."""
+  id: ID!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
 type Query {
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
+  games(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Game]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
-  post(where: PostWhereUniqueInput!): Post
+  game(where: GameWhereUniqueInput!): Game
   user(where: UserWhereUniqueInput!): User
-  postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  gamesConnection(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): GameConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
@@ -407,7 +390,7 @@ type Query {
 }
 
 type Subscription {
-  post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  game(where: GameSubscriptionWhereInput): GameSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -416,7 +399,8 @@ type User implements Node {
   email: String!
   password: String!
   name: String!
-  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  gamesJoined(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Game!]
+  gamesWon(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Game!]
 }
 
 """A connection to a list of items."""
@@ -433,18 +417,32 @@ input UserCreateInput {
   email: String!
   password: String!
   name: String!
-  posts: PostCreateManyWithoutAuthorInput
+  gamesJoined: GameCreateManyWithoutPlayersInput
+  gamesWon: GameCreateManyWithoutWinnerInput
 }
 
-input UserCreateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserCreateManyWithoutGamesJoinedInput {
+  create: [UserCreateWithoutGamesJoinedInput!]
+  connect: [UserWhereUniqueInput!]
+}
+
+input UserCreateOneWithoutGamesWonInput {
+  create: UserCreateWithoutGamesWonInput
   connect: UserWhereUniqueInput
 }
 
-input UserCreateWithoutPostsInput {
+input UserCreateWithoutGamesJoinedInput {
   email: String!
   password: String!
   name: String!
+  gamesWon: GameCreateManyWithoutWinnerInput
+}
+
+input UserCreateWithoutGamesWonInput {
+  email: String!
+  password: String!
+  name: String!
+  gamesJoined: GameCreateManyWithoutPlayersInput
 }
 
 """An edge in a connection."""
@@ -521,26 +519,56 @@ input UserUpdateInput {
   email: String
   password: String
   name: String
-  posts: PostUpdateManyWithoutAuthorInput
+  gamesJoined: GameUpdateManyWithoutPlayersInput
+  gamesWon: GameUpdateManyWithoutWinnerInput
 }
 
-input UserUpdateOneWithoutPostsInput {
-  create: UserCreateWithoutPostsInput
+input UserUpdateManyWithoutGamesJoinedInput {
+  create: [UserCreateWithoutGamesJoinedInput!]
+  connect: [UserWhereUniqueInput!]
+  disconnect: [UserWhereUniqueInput!]
+  delete: [UserWhereUniqueInput!]
+  update: [UserUpdateWithWhereUniqueWithoutGamesJoinedInput!]
+  upsert: [UserUpsertWithWhereUniqueWithoutGamesJoinedInput!]
+}
+
+input UserUpdateOneWithoutGamesWonInput {
+  create: UserCreateWithoutGamesWonInput
   connect: UserWhereUniqueInput
+  disconnect: Boolean
   delete: Boolean
-  update: UserUpdateWithoutPostsDataInput
-  upsert: UserUpsertWithoutPostsInput
+  update: UserUpdateWithoutGamesWonDataInput
+  upsert: UserUpsertWithoutGamesWonInput
 }
 
-input UserUpdateWithoutPostsDataInput {
+input UserUpdateWithoutGamesJoinedDataInput {
   email: String
   password: String
   name: String
+  gamesWon: GameUpdateManyWithoutWinnerInput
 }
 
-input UserUpsertWithoutPostsInput {
-  update: UserUpdateWithoutPostsDataInput!
-  create: UserCreateWithoutPostsInput!
+input UserUpdateWithoutGamesWonDataInput {
+  email: String
+  password: String
+  name: String
+  gamesJoined: GameUpdateManyWithoutPlayersInput
+}
+
+input UserUpdateWithWhereUniqueWithoutGamesJoinedInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutGamesJoinedDataInput!
+}
+
+input UserUpsertWithoutGamesWonInput {
+  update: UserUpdateWithoutGamesWonDataInput!
+  create: UserCreateWithoutGamesWonInput!
+}
+
+input UserUpsertWithWhereUniqueWithoutGamesJoinedInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutGamesJoinedDataInput!
+  create: UserCreateWithoutGamesJoinedInput!
 }
 
 input UserWhereInput {
@@ -712,9 +740,12 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   name_not_ends_with: String
-  posts_every: PostWhereInput
-  posts_some: PostWhereInput
-  posts_none: PostWhereInput
+  gamesJoined_every: GameWhereInput
+  gamesJoined_some: GameWhereInput
+  gamesJoined_none: GameWhereInput
+  gamesWon_every: GameWhereInput
+  gamesWon_some: GameWhereInput
+  gamesWon_none: GameWhereInput
 }
 
 input UserWhereUniqueInput {
