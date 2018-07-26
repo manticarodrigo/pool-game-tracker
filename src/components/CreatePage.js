@@ -1,19 +1,27 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class CreatePage extends Component {
   state = {
     title: '',
-    text: '',
+    opponent: undefined
+  }
+  static getDerivedStateFromProps(props, state) {
+    if (!state.opponent) {
+      return {
+        opponent: props.usersQuery.users ? props.usersQuery.users[0].id : undefined
+      }
+    }
+    return null
   }
 
   render() {
     return (
       <div className="pa4 flex justify-center bg-white">
-        <form onSubmit={this.handlePost}>
-          <h1>Create Draft</h1>
+        <form onSubmit={this.handleSubmit}>
+          <h1>Create Game</h1>
           <input
             autoFocus
             className="w-100 pa2 mv2 br2 b--black-20 bw1"
@@ -22,52 +30,90 @@ class CreatePage extends Component {
             type="text"
             value={this.state.title}
           />
-          <textarea
-            className="db w-100 ba bw1 b--black-20 pa2 br2 mb2"
-            cols={50}
-            onChange={e => this.setState({ text: e.target.value })}
-            placeholder="Content"
-            rows={8}
-            value={this.state.text}
-          />
-          <input
-            className={`pa3 bg-black-10 bn ${this.state.text &&
-              this.state.title &&
-              'dim pointer'}`}
-            disabled={!this.state.text || !this.state.title}
-            type="submit"
-            value="Create"
-          />
-          <a className="f6 pointer" onClick={this.props.history.goBack}>
-            or cancel
-          </a>
+          <p><strong>Player 1</strong></p>
+          <select>
+            <option>{this.props.meQuery.me ? this.props.meQuery.me.name : 'No current user found.'}</option>
+          </select>
+          <p><strong>Player 2</strong></p>
+          <select
+            value={this.state.opponent}
+            onChange={e => this.setState({ opponent: e.target.value })}
+          >
+            {this.props.usersQuery.users &&
+              this.props.usersQuery.users.map(user => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+          <p>
+            <input
+              style={{ marginRight: '1em'}}
+              className={`pa3 bg-black-10 bn ${(this.state.player1 && this.state.opponent) &&
+                this.state.title &&
+                'dim pointer'}`}
+              disabled={(!this.state.player1 && !this.state.opponent) || !this.state.title}
+              type="submit"
+              value="Create"
+            />
+            <a className="f6 pointer" onClick={this.props.history.goBack}>
+              or cancel
+            </a>
+          </p>
         </form>
       </div>
     )
   }
 
-  handlePost = async e => {
+  handleSubmit = async e => {
     e.preventDefault()
-    const { title, text } = this.state
-    await this.props.createDraftMutation({
-      variables: { title, text },
+    const { title, opponent } = this.state
+    console.log(this.state)
+    await this.props.createGameMutation({
+      variables: { title, opponent }
     })
-    this.props.history.replace('/drafts')
+    this.props.history.replace('/games')
   }
 }
 
-const CREATE_DRAFT_MUTATION = gql`
-  mutation CreateDraftMutation($title: String!, $text: String!) {
-    createDraft(title: $title, text: $text) {
+const ME_QUERY = gql`
+  query MeQuery {
+    me {
       id
-      title
-      text
+      email
+      name
     }
   }
 `
 
-const CreatePageWithMutation = graphql(CREATE_DRAFT_MUTATION, {
-  name: 'createDraftMutation', // name of the injected prop: this.props.createDraftMutation...
-})(CreatePage)
+const USERS_QUERY = gql`
+  query UsersQuery {
+    users {
+      id
+      email
+      name
+    }
+  }
+`
+
+const CREATE_GAME_MUTATION = gql`
+  mutation CreateGameMutation($title: String!, $opponent: ID!) {
+    createGame(title: $title, opponent: $opponent) {
+      id
+    }
+  }
+`
+
+const CreatePageWithMutation = compose(
+  graphql(ME_QUERY, {
+    name: 'meQuery'
+  }),
+  graphql(USERS_QUERY, {
+    name: 'usersQuery'
+  }),
+  graphql(CREATE_GAME_MUTATION, {
+    name: 'createGameMutation',
+  })
+)(CreatePage)
 
 export default withRouter(CreatePageWithMutation)

@@ -1,15 +1,17 @@
 const { getUserId } = require('../../utils')
 
 const game = {
-  async createGame(parent, { title, users }, ctx, info) {
+  async createGame(parent, { title, opponent }, ctx, info) {
+    const userId = getUserId(ctx)
+    const players = { connect: [ { id: userId }, { id: opponent }] }
     return ctx.db.mutation.createGame(
       {
         data: {
           title,
-          users
+          players
         },
       },
-      info
+      info,
     )
   },
 
@@ -17,7 +19,7 @@ const game = {
     const userId = getUserId(ctx)
     const gameExists = await ctx.db.exists.Game({
       id,
-      users: [{ id: userId }],
+      players: [{ id: userId }],
     })
     if (!gameExists) {
       throw new Error(`Game not found or you're not a participant`)
@@ -36,7 +38,7 @@ const game = {
     const userId = getUserId(ctx)
     const gameExists = await ctx.db.exists.Game({
       id,
-      users: [{ id: userId }],
+      players: [{ id: userId }],
     })
     if (!gameExists) {
       throw new Error(`Game not found or you're not a participant`)

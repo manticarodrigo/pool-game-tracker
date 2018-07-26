@@ -2,14 +2,7 @@ const { getUserId } = require('../utils')
 
 const Query = {
   games(parent, args, ctx, info) {
-    const id = getUserId(ctx)
-    const where = {
-      users: [{
-        id
-      }]
-    }
-
-    return ctx.db.query.games({ where }, info)
+    return ctx.db.query.games({ orderBy: 'createdAt_DESC' }, info)
   },
 
   game(parent, { id }, ctx, info) {
@@ -22,7 +15,8 @@ const Query = {
   },
 
   users(parent, args, ctx, info) {
-    return ctx.db.query.user({}, info)
+    const id = getUserId(ctx)
+    return ctx.db.query.users({ where : { id_not: id } }, info)
   }
 }
 

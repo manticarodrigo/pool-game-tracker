@@ -4,7 +4,6 @@ type Game {
   updatedAt: DateTime!
   title: String!
   players: [User!]! @relation(name: "GamesJoined")
-  winner: User @relation(name: "GamesWon")
 }
 
 type User {

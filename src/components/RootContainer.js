@@ -8,8 +8,8 @@ import {
   Redirect,
 } from 'react-router-dom'
 import AboutPage from './AboutPage'
-import FeedPage from './FeedPage'
-import DraftsPage from './DraftsPage'
+import GamesPage from './GamesPage'
+import LeaderboardsPage from './LeaderboardsPage'
 import CreatePage from './CreatePage'
 import DetailPage from './DetailPage'
 import LoginPage from './LoginPage'
@@ -133,10 +133,10 @@ class RootContainer extends Component {
               className="link dim f6 f5-ns dib mr3 black"
               activeClassName="gray"
               exact={true}
-              to="/drafts"
-              title="Drafts"
+              to="/leaderboards"
+              title="Leaderboards"
             >
-              Drafts
+              Leaderboards
             </NavLink>
           )}
         {this.state.token ? (
@@ -180,19 +180,19 @@ class RootContainer extends Component {
     return (
       <div className="fl w-100 pl4 pr4">
         <Switch>
-          <Route exact path="/" component={FeedPage} />
+          <Route exact path="/" component={GamesPage} />
           <Route exact path="/about" component={AboutPage} />
           <ProtectedRoute
             token={this.state.token}
-            path="/drafts"
-            component={DraftsPage}
+            path="/leaderboards"
+            component={LeaderboardsPage}
           />
           <ProtectedRoute
             token={this.state.token}
             path="/create"
             component={CreatePage}
           />
-          <Route path="/post/:id" component={DetailPage} />
+          <Route path="/game/:id" component={DetailPage} />
           <Route
             token={this.state.token}
             path="/login"

@@ -5,7 +5,7 @@ import  { gql } from 'apollo-boost'
 
 class DetailPage extends Component {
   render() {
-    if (this.props.postQuery.loading) {
+    if (this.props.gameQuery.loading) {
       return (
         <div className="flex w-100 h-100 items-center justify-center pt7">
           <div>Loading (from {process.env.REACT_APP_GRAPHQL_ENDPOINT})</div>
@@ -13,21 +13,21 @@ class DetailPage extends Component {
       )
     }
 
-    const { post } = this.props.postQuery
+    const { game } = this.props.gameQuery
 
-    let action = this._renderAction(post)
+    let action = this._renderAction(game)
 
     return (
       <Fragment>
-        <h1 className="f3 black-80 fw4 lh-solid">{post.title}</h1>
-        <p className="black-80 fw3">{post.text}</p>
+        <h1 className="f3 black-80 fw4 lh-solid">{game.title}</h1>
+        <p className="black-80 fw3">{game.text}</p>
         {action}
       </Fragment>
     )
   }
 
-  _renderAction = ({ id, isPublished }) => {
-    if (!isPublished) {
+  _renderAction = ({ id, winner }) => {
+    if (!winner) {
       return (
         <Fragment>
           <a
@@ -38,7 +38,7 @@ class DetailPage extends Component {
           </a>{' '}
           <a
             className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-            onClick={() => this.deletePost(id)}
+            onClick={() => this.deleteGame(id)}
           >
             Delete
           </a>
@@ -48,15 +48,15 @@ class DetailPage extends Component {
     return (
       <a
         className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-        onClick={() => this.deletePost(id)}
+        onClick={() => this.deleteGame(id)}
       >
         Delete
       </a>
     )
   }
 
-  deletePost = async id => {
-    await this.props.deletePost({
+  deleteGame = async id => {
+    await this.props.deleteGame({
       variables: { id },
     })
     this.props.history.replace('/')
@@ -71,15 +71,12 @@ class DetailPage extends Component {
 }
 
 const POST_QUERY = gql`
-  query PostQuery($id: ID!) {
-    post(id: $id) {
+  query GameQuery($id: ID!) {
+    game(id: $id) {
       id
       title
-      text
-      isPublished
-      author {
-        name
-      }
+      users
+      winner
     }
   }
 `
@@ -94,8 +91,8 @@ const PUBLISH_MUTATION = gql`
 `
 
 const DELETE_MUTATION = gql`
-  mutation deletePost($id: ID!) {
-    deletePost(id: $id) {
+  mutation deleteGame($id: ID!) {
+    deleteGame(id: $id) {
       id
     }
   }
@@ -103,7 +100,7 @@ const DELETE_MUTATION = gql`
 
 export default compose(
   graphql(POST_QUERY, {
-    name: 'postQuery',
+    name: 'gameQuery',
     options: props => ({
       variables: {
         id: props.match.params.id,
@@ -114,7 +111,7 @@ export default compose(
     name: 'publishDraft',
   }),
   graphql(DELETE_MUTATION, {
-    name: 'deletePost',
+    name: 'deleteGame',
   }),
   withRouter,
 )(DetailPage)

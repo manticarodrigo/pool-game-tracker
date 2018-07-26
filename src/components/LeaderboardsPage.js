@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import Post from '../components/Post'
+import Game from '../components/Game'
 import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
-class DraftsPage extends Component {
+class LeaderboardsPage extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.location.key !== nextProps.location.key) {
       this.props.draftsQuery.refetch()
@@ -26,9 +26,9 @@ class DraftsPage extends Component {
         </div>
         {this.props.draftsQuery.drafts &&
           this.props.draftsQuery.drafts.map(draft => (
-            <Post
+            <Game
               key={draft.id}
-              post={draft}
+              game={draft}
               refresh={() => this.props.draftsQuery.refetch()}
               isDraft={!draft.isPublished}
             />
@@ -58,4 +58,4 @@ export default graphql(DRAFTS_QUERY, {
   options: {
     fetchPolicy: 'network-only',
   },
-})(DraftsPage)
+})(LeaderboardsPage)

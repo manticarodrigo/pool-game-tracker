@@ -26,14 +26,14 @@ a {
   background-color: #000;
 }
 
-.post {
+.game {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
   width: 350px;
   height: 350px;
   flex: 0 0 350px;
 }
 
-.post .description {
+.game .description {
   flex: 1;
   padding-left: 25px;
   font-size: 25px;
@@ -59,7 +59,7 @@ a {
   font-size: 18px;
 }
 
-.new-post {
+.new-game {
   background-color: rgba(0, 0, 0, 0.04);
 }
 
