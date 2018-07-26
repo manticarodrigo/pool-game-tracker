@@ -17,6 +17,15 @@ html {
   box-sizing: inherit;
 }
 
+a {
+  outline: 0 !important;
+}
+
+.login {
+  color: #fff;
+  background-color: #000;
+}
+
 .post {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
   width: 350px;

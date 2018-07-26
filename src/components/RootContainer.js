@@ -7,6 +7,7 @@ import {
   Switch,
   Redirect,
 } from 'react-router-dom'
+import AboutPage from './AboutPage'
 import FeedPage from './FeedPage'
 import DraftsPage from './DraftsPage'
 import CreatePage from './CreatePage'
@@ -19,6 +20,8 @@ import { AUTH_TOKEN } from '../constant'
 import { isTokenExpired } from '../helper/jwtHelper'
 import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
+
+import Logo from '../assets/pool-logo.png'
 
 const ProtectedRoute = ({ component: Component, token, ...rest }) => {
   return token ? (
@@ -87,18 +90,40 @@ class RootContainer extends Component {
 
   renderNavBar() {
     return (
-      <nav className="pa3 pa4-ns">
-        <Link className="link dim black b f6 f5-ns dib mr3" to="/" title="Feed">
-          Blog
-        </Link>
+      <nav className="pa3 pa4-ns" style={{ textAlign: 'top' }}>
+        <NavLink
+          className="link"
+          exact={true}
+          to="/"
+          title="Home"
+        >
+          <img
+            src={Logo}
+            alt="Pool Game Tracker Logo"
+            style={{
+              display: 'inline-block',
+              maxWidth: '80px',
+              marginRight: '2em',
+              marginBottom: '-1em'
+            }}
+          />
+        </NavLink>
         <NavLink
           className="link dim f6 f5-ns dib mr3 black"
           activeClassName="gray"
           exact={true}
           to="/"
-          title="Feed"
+          title="Games"
         >
-          Feed
+          Games
+        </NavLink>
+        <NavLink
+          className="link dim f6 f5-ns dib mr3 black"
+          activeClassName="gray"
+          exact={true}
+          to="/about"
+          title="About">
+          About
         </NavLink>
         {this.props.data &&
           this.props.data.me &&
@@ -130,7 +155,7 @@ class RootContainer extends Component {
         ) : (
           <Link
             to="/login"
-            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black login"
           >
             Login
           </Link>
@@ -142,8 +167,9 @@ class RootContainer extends Component {
             <Link
               to="/create"
               className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+              style={{ marginRight: '1em' }}
             >
-              + Create Draft
+              + Create Game
             </Link>
           )}
       </nav>
@@ -155,6 +181,7 @@ class RootContainer extends Component {
       <div className="fl w-100 pl4 pr4">
         <Switch>
           <Route exact path="/" component={FeedPage} />
+          <Route exact path="/about" component={AboutPage} />
           <ProtectedRoute
             token={this.state.token}
             path="/drafts"

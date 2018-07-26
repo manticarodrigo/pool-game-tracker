@@ -25,7 +25,7 @@ class FeedPage extends Component {
 
     return (
       <Fragment>
-        <h1>Feed</h1>
+        <h1>Games</h1>
         {this.props.feedQuery.feed &&
           this.props.feedQuery.feed.map(post => (
             <Post
