@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/public-chocolateiguana-404/pool-game-tracking/dev
-# timestamp: Thu Jul 26 2018 18:18:12 GMT-0400 (EDT)
+# timestamp: Thu Jul 26 2018 19:12:10 GMT-0400 (EDT)
 
 type AggregateGame {
   count: Int!
@@ -22,6 +22,7 @@ type Game implements Node {
   updatedAt: DateTime!
   title: String!
   players(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User!]
+  winner(where: UserWhereInput): User
 }
 
 """A connection to a list of items."""
@@ -37,11 +38,7 @@ type GameConnection {
 input GameCreateInput {
   title: String!
   players: UserCreateManyWithoutGamesJoinedInput
-}
-
-input GameCreateManyInput {
-  create: [GameCreateInput!]
-  connect: [GameWhereUniqueInput!]
+  winner: UserCreateOneWithoutGamesWonInput
 }
 
 input GameCreateManyWithoutPlayersInput {
@@ -49,8 +46,19 @@ input GameCreateManyWithoutPlayersInput {
   connect: [GameWhereUniqueInput!]
 }
 
+input GameCreateManyWithoutWinnerInput {
+  create: [GameCreateWithoutWinnerInput!]
+  connect: [GameWhereUniqueInput!]
+}
+
 input GameCreateWithoutPlayersInput {
   title: String!
+  winner: UserCreateOneWithoutGamesWonInput
+}
+
+input GameCreateWithoutWinnerInput {
+  title: String!
+  players: UserCreateManyWithoutGamesJoinedInput
 }
 
 """An edge in a connection."""
@@ -119,23 +127,10 @@ input GameSubscriptionWhereInput {
   node: GameWhereInput
 }
 
-input GameUpdateDataInput {
-  title: String
-  players: UserUpdateManyWithoutGamesJoinedInput
-}
-
 input GameUpdateInput {
   title: String
   players: UserUpdateManyWithoutGamesJoinedInput
-}
-
-input GameUpdateManyInput {
-  create: [GameCreateInput!]
-  connect: [GameWhereUniqueInput!]
-  disconnect: [GameWhereUniqueInput!]
-  delete: [GameWhereUniqueInput!]
-  update: [GameUpdateWithWhereUniqueNestedInput!]
-  upsert: [GameUpsertWithWhereUniqueNestedInput!]
+  winner: UserUpdateOneWithoutGamesWonInput
 }
 
 input GameUpdateManyWithoutPlayersInput {
@@ -147,13 +142,23 @@ input GameUpdateManyWithoutPlayersInput {
   upsert: [GameUpsertWithWhereUniqueWithoutPlayersInput!]
 }
 
-input GameUpdateWithoutPlayersDataInput {
-  title: String
+input GameUpdateManyWithoutWinnerInput {
+  create: [GameCreateWithoutWinnerInput!]
+  connect: [GameWhereUniqueInput!]
+  disconnect: [GameWhereUniqueInput!]
+  delete: [GameWhereUniqueInput!]
+  update: [GameUpdateWithWhereUniqueWithoutWinnerInput!]
+  upsert: [GameUpsertWithWhereUniqueWithoutWinnerInput!]
 }
 
-input GameUpdateWithWhereUniqueNestedInput {
-  where: GameWhereUniqueInput!
-  data: GameUpdateDataInput!
+input GameUpdateWithoutPlayersDataInput {
+  title: String
+  winner: UserUpdateOneWithoutGamesWonInput
+}
+
+input GameUpdateWithoutWinnerDataInput {
+  title: String
+  players: UserUpdateManyWithoutGamesJoinedInput
 }
 
 input GameUpdateWithWhereUniqueWithoutPlayersInput {
@@ -161,16 +166,21 @@ input GameUpdateWithWhereUniqueWithoutPlayersInput {
   data: GameUpdateWithoutPlayersDataInput!
 }
 
-input GameUpsertWithWhereUniqueNestedInput {
+input GameUpdateWithWhereUniqueWithoutWinnerInput {
   where: GameWhereUniqueInput!
-  update: GameUpdateDataInput!
-  create: GameCreateInput!
+  data: GameUpdateWithoutWinnerDataInput!
 }
 
 input GameUpsertWithWhereUniqueWithoutPlayersInput {
   where: GameWhereUniqueInput!
   update: GameUpdateWithoutPlayersDataInput!
   create: GameCreateWithoutPlayersInput!
+}
+
+input GameUpsertWithWhereUniqueWithoutWinnerInput {
+  where: GameWhereUniqueInput!
+  update: GameUpdateWithoutWinnerDataInput!
+  create: GameCreateWithoutWinnerInput!
 }
 
 input GameWhereInput {
@@ -309,9 +319,7 @@ input GameWhereInput {
   players_every: UserWhereInput
   players_some: UserWhereInput
   players_none: UserWhereInput
-  _MagicalBackRelation_GamesWon_every: UserWhereInput
-  _MagicalBackRelation_GamesWon_some: UserWhereInput
-  _MagicalBackRelation_GamesWon_none: UserWhereInput
+  winner: UserWhereInput
 }
 
 input GameWhereUniqueInput {
@@ -325,18 +333,18 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createUser(data: UserCreateInput!): User!
   createGame(data: GameCreateInput!): Game!
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  createUser(data: UserCreateInput!): User!
   updateGame(data: GameUpdateInput!, where: GameWhereUniqueInput!): Game
-  deleteUser(where: UserWhereUniqueInput!): User
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteGame(where: GameWhereUniqueInput!): Game
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
   upsertGame(where: GameWhereUniqueInput!, create: GameCreateInput!, update: GameUpdateInput!): Game!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyGames(data: GameUpdateInput!, where: GameWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
   deleteManyGames(where: GameWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -367,12 +375,12 @@ type PageInfo {
 }
 
 type Query {
-  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   games(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Game]!
-  user(where: UserWhereUniqueInput!): User
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   game(where: GameWhereUniqueInput!): Game
-  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  user(where: UserWhereUniqueInput!): User
   gamesConnection(where: GameWhereInput, orderBy: GameOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): GameConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -382,8 +390,8 @@ type Query {
 }
 
 type Subscription {
-  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   game(where: GameSubscriptionWhereInput): GameSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type User implements Node {
@@ -410,7 +418,7 @@ input UserCreateInput {
   password: String!
   name: String!
   gamesJoined: GameCreateManyWithoutPlayersInput
-  gamesWon: GameCreateManyInput
+  gamesWon: GameCreateManyWithoutWinnerInput
 }
 
 input UserCreateManyWithoutGamesJoinedInput {
@@ -418,11 +426,23 @@ input UserCreateManyWithoutGamesJoinedInput {
   connect: [UserWhereUniqueInput!]
 }
 
+input UserCreateOneWithoutGamesWonInput {
+  create: UserCreateWithoutGamesWonInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreateWithoutGamesJoinedInput {
   email: String!
   password: String!
   name: String!
-  gamesWon: GameCreateManyInput
+  gamesWon: GameCreateManyWithoutWinnerInput
+}
+
+input UserCreateWithoutGamesWonInput {
+  email: String!
+  password: String!
+  name: String!
+  gamesJoined: GameCreateManyWithoutPlayersInput
 }
 
 """An edge in a connection."""
@@ -500,7 +520,7 @@ input UserUpdateInput {
   password: String
   name: String
   gamesJoined: GameUpdateManyWithoutPlayersInput
-  gamesWon: GameUpdateManyInput
+  gamesWon: GameUpdateManyWithoutWinnerInput
 }
 
 input UserUpdateManyWithoutGamesJoinedInput {
@@ -512,16 +532,37 @@ input UserUpdateManyWithoutGamesJoinedInput {
   upsert: [UserUpsertWithWhereUniqueWithoutGamesJoinedInput!]
 }
 
+input UserUpdateOneWithoutGamesWonInput {
+  create: UserCreateWithoutGamesWonInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutGamesWonDataInput
+  upsert: UserUpsertWithoutGamesWonInput
+}
+
 input UserUpdateWithoutGamesJoinedDataInput {
   email: String
   password: String
   name: String
-  gamesWon: GameUpdateManyInput
+  gamesWon: GameUpdateManyWithoutWinnerInput
+}
+
+input UserUpdateWithoutGamesWonDataInput {
+  email: String
+  password: String
+  name: String
+  gamesJoined: GameUpdateManyWithoutPlayersInput
 }
 
 input UserUpdateWithWhereUniqueWithoutGamesJoinedInput {
   where: UserWhereUniqueInput!
   data: UserUpdateWithoutGamesJoinedDataInput!
+}
+
+input UserUpsertWithoutGamesWonInput {
+  update: UserUpdateWithoutGamesWonDataInput!
+  create: UserCreateWithoutGamesWonInput!
 }
 
 input UserUpsertWithWhereUniqueWithoutGamesJoinedInput {

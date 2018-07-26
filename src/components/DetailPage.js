@@ -14,44 +14,48 @@ class DetailPage extends Component {
     }
 
     const { game } = this.props.gameQuery
-
+    
     let action = this._renderAction(game)
-
+    let createDate = new Date(game.createdAt)
+    let updatedDate = new Date(game.updatedAt)
     return (
       <Fragment>
         <h1 className="f3 black-80 fw4 lh-solid">{game.title}</h1>
-        <p className="black-80 fw3">{game.text}</p>
-        {action}
+        <p className="black-80 fw3">{'Started at ' + createDate.toLocaleTimeString()}</p>
+        {game.winner && (
+          <p className="black-80 fw3">{'Finished at ' + updatedDate.toLocaleTimeString()}</p>
+        )}
+        <br />
+        {!game.winner ? action : null}
       </Fragment>
     )
   }
 
   _renderAction = ({ id, winner }) => {
-    if (!winner) {
-      return (
-        <Fragment>
-          <a
-            className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-            onClick={() => this.publishDraft(id)}
-          >
-            Publish
-          </a>{' '}
-          <a
-            className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-            onClick={() => this.deleteGame(id)}
-          >
-            Delete
-          </a>
-        </Fragment>
-      )
-    }
+    const { game } = this.props.gameQuery
     return (
-      <a
-        className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
-        onClick={() => this.deleteGame(id)}
-      >
-        Delete
-      </a>
+      <Fragment>
+        <p><strong>Choose Winner</strong></p>
+        {game.players &&
+          game.players.map(user => (
+            <p key={user.id}>
+              <a
+                style={{ minWidth: '150px' }}
+                className="f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+                onClick={() => this.chooseWinner(id, user.id)}
+              >
+                {user.name}
+              </a>
+            </p>
+        ))}
+        <p><strong>Delete Game</strong></p>
+        <a
+          className="delete f6 dim br1 ba ph3 pv2 mb2 dib black pointer"
+          onClick={() => this.deleteGame(id)}
+        >
+          Delete
+        </a>
+      </Fragment>
     )
   }
 
@@ -62,30 +66,38 @@ class DetailPage extends Component {
     this.props.history.replace('/')
   }
 
-  publishDraft = async id => {
-    await this.props.publishDraft({
-      variables: { id },
+  chooseWinner = async (id, winnerId) => {
+    await this.props.chooseWinner({
+      variables: { id, winnerId },
     })
     this.props.history.replace('/')
   }
 }
 
-const POST_QUERY = gql`
+const GAME_QUERY = gql`
   query GameQuery($id: ID!) {
     game(id: $id) {
       id
+      createdAt
+      updatedAt
       title
-      users
-      winner
+      players {
+        id
+        name
+      }
+      winner {
+        id
+        name
+      }
     }
   }
 `
 
-const PUBLISH_MUTATION = gql`
-  mutation publish($id: ID!) {
-    publish(id: $id) {
+const CHOOSE_WINNER_MUTATION = gql`
+  mutation chooseWinner($id: ID!, $winnerId: ID!) {
+    chooseWinner(id: $id, winnerId: $winnerId) {
       id
-      isPublished
+      title
     }
   }
 `
@@ -99,7 +111,7 @@ const DELETE_MUTATION = gql`
 `
 
 export default compose(
-  graphql(POST_QUERY, {
+  graphql(GAME_QUERY, {
     name: 'gameQuery',
     options: props => ({
       variables: {
@@ -107,8 +119,8 @@ export default compose(
       },
     }),
   }),
-  graphql(PUBLISH_MUTATION, {
-    name: 'publishDraft',
+  graphql(CHOOSE_WINNER_MUTATION, {
+    name: 'chooseWinner',
   }),
   graphql(DELETE_MUTATION, {
     name: 'deleteGame',

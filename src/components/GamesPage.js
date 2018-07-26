@@ -4,8 +4,9 @@ import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class GamesPage extends Component {
-  componentWillReceiveProps(nextProps) {
-    if (this.props.location.key !== nextProps.location.key) {
+  
+  componentDidUpdate(prevProps) {
+    if (prevProps.location.key !== this.props.location.key) {
       this.props.gamesQuery.refetch()
     }
   }
@@ -15,6 +16,9 @@ class GamesPage extends Component {
   }
 
   render() {
+    const games = this.props.gamesQuery.games
+    const ongoingGames = games ? games.filter(game => !game.winner) : null
+    const finishedGames = games ? games.filter(game => game.winner) : null
     if (this.props.gamesQuery.loading) {
       return (
         <div className="flex w-100 h-100 items-center justify-center pt7">
@@ -25,14 +29,22 @@ class GamesPage extends Component {
 
     return (
       <Fragment>
-        <h1>Games</h1>
-        {this.props.gamesQuery.games &&
-          this.props.gamesQuery.games.map(game => (
+        <h1>Ongoing Games</h1>
+        {ongoingGames &&
+          ongoingGames.map(game => (
             <Game
               key={game.id}
               game={game}
               refresh={() => this.props.gamesQuery.refetch()}
-              isDraft={!game.isPublished}
+            />
+          ))}
+        <h1>Finished Games</h1>
+        {finishedGames &&
+          finishedGames.map(game => (
+            <Game
+              key={game.id}
+              game={game}
+              refresh={() => this.props.gamesQuery.refetch()}
             />
           ))}
         {this.props.children}

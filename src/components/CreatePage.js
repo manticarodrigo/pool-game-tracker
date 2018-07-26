@@ -72,7 +72,7 @@ class CreatePage extends Component {
     await this.props.createGameMutation({
       variables: { title, opponent }
     })
-    this.props.history.replace('/games')
+    this.props.history.replace('/')
   }
 }
 
@@ -100,6 +100,7 @@ const CREATE_GAME_MUTATION = gql`
   mutation CreateGameMutation($title: String!, $opponent: ID!) {
     createGame(title: $title, opponent: $opponent) {
       id
+      title
     }
   }
 `

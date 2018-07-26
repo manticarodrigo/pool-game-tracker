@@ -11,7 +11,7 @@ type Mutation {
   signup(email: String!, password: String!, name: String!): AuthPayload!
   login(email: String!, password: String!): AuthPayload!
   createGame(title: String!, opponent: ID!): Game!
-  chooseWinner(id: ID!): Game!
+  chooseWinner(id: ID!, winnerId: ID!): Game!
   deleteGame(id: ID!): Game!
 }
 

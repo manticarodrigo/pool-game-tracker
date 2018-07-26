@@ -15,11 +15,12 @@ const game = {
     )
   },
 
-  async chooseWinner(parent, { id }, ctx, info) {
+  async chooseWinner(parent, { id, winnerId }, ctx, info) {
+
     const userId = getUserId(ctx)
     const gameExists = await ctx.db.exists.Game({
       id,
-      players: [{ id: userId }],
+      players_some: { id: userId }
     })
     if (!gameExists) {
       throw new Error(`Game not found or you're not a participant`)
@@ -28,7 +29,7 @@ const game = {
     return ctx.db.mutation.updateGame(
       {
         where: { id },
-        data: { winner: userId },
+        data: { winner: { connect: { id: winnerId } } },
       },
       info,
     )

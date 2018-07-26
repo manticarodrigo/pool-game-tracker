@@ -138,7 +138,7 @@ class RootContainer extends Component {
             >
               Leaderboards
             </NavLink>
-          )}
+        )}
         {this.state.token ? (
           <div
             onClick={() => {
@@ -148,7 +148,7 @@ class RootContainer extends Component {
                 })
               window.location.href = '/'
             }}
-            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+            className="f6 link dim br1 ba ph3 pv2 fr mb2 dib black pointer"
           >
             Logout
           </div>

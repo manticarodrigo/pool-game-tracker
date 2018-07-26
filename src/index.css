@@ -21,9 +21,14 @@ a {
   outline: 0 !important;
 }
 
-.login {
+.login,
+.delete {
   color: #fff;
   background-color: #000;
+}
+
+.game-row {
+  color: #333 !important;
 }
 
 .game {
