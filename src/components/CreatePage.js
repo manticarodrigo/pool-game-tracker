@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Query, graphql, compose } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class CreatePage extends Component {

@@ -1,5 +1,6 @@
 {
-  "name": "react-apollo-instagram-example",
+  "name": "pool-game-tracker",
+  "homepage": "https://manticarodrigo.github.io/pool-game-tracker",
   "version": "0.0.1",
   "private": true,
   "devDependencies": {
@@ -10,6 +11,7 @@
     "eslint-plugin-import": "2.13.0",
     "eslint-plugin-jsx-a11y": "5.1.1",
     "eslint-plugin-react": "7.10.0",
+    "gh-pages": "^1.2.0",
     "jwt-decode": "2.2.0",
     "prettier-eslint-cli": "4.7.1",
     "react-scripts": "1.1.4"
@@ -42,6 +44,7 @@
     "lint": "eslint .",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy" : "npm run build&&gh-pages -d build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "prettier": "prettier-eslint --write \"src/**/*.+(js|jsx)\"",
