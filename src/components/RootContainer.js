@@ -117,14 +117,6 @@ class RootContainer extends Component {
         >
           Games
         </NavLink>
-        <NavLink
-          className="link dim f6 f5-ns dib mr3 black"
-          activeClassName="gray"
-          exact={true}
-          to="/about"
-          title="About">
-          About
-        </NavLink>
         {this.props.data &&
           this.props.data.me &&
           this.props.data.me.email &&
@@ -139,6 +131,14 @@ class RootContainer extends Component {
               Leaderboards
             </NavLink>
         )}
+        <NavLink
+          className="link dim f6 f5-ns dib mr3 black"
+          activeClassName="gray"
+          exact={true}
+          to="/about"
+          title="About">
+          About
+        </NavLink>
         {this.state.token ? (
           <div
             onClick={() => {

@@ -39,7 +39,7 @@ const game = {
     const userId = getUserId(ctx)
     const gameExists = await ctx.db.exists.Game({
       id,
-      players: [{ id: userId }],
+      players_some: { id: userId }
     })
     if (!gameExists) {
       throw new Error(`Game not found or you're not a participant`)

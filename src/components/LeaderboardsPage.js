@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from 'react'
-import Game from '../components/Game'
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class LeaderboardsPage extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.key !== this.props.location.key) {
+      this.props.meQuert.refetch()
       this.props.usersQuery.refetch()
     }
   }
@@ -23,6 +23,7 @@ class LeaderboardsPage extends Component {
   render() {
     const users = this.props.usersQuery.users
     const reference = users ? JSON.parse(JSON.stringify(users)) : null
+    if (users) { reference.push(this.props.meQuery.me) }
     const rankedUsers = users ? reference.sort(this.compare) : null
     if (this.props.usersQuery.loading) {
       return (
@@ -49,6 +50,20 @@ class LeaderboardsPage extends Component {
   }
 }
 
+const ME_QUERY = gql`
+  query MeQuery {
+    me {
+      id
+      email
+      name
+      gamesWon {
+        id
+        title
+      }
+    }
+  }
+`
+
 const USERS_QUERY = gql`
   query UsersQuery {
     users {
@@ -63,9 +78,11 @@ const USERS_QUERY = gql`
   }
 `
 
-export default graphql(USERS_QUERY, {
-  name: 'usersQuery', // name of the injected prop: this.props.feedQuery...
-  options: {
-    fetchPolicy: 'network-only',
-  },
-})(LeaderboardsPage)
+export default compose(
+  graphql(ME_QUERY, {
+    name: 'meQuery'
+  }),
+  graphql(USERS_QUERY, {
+    name: 'usersQuery'
+  }),
+)(LeaderboardsPage)
