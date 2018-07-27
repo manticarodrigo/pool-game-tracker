@@ -90,6 +90,7 @@ const ME_QUERY = gql`
     }
   }
 `
+
 const USERS_QUERY = gql`
   query UsersQuery {
     users {

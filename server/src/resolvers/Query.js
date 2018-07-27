@@ -15,7 +15,6 @@ const Query = {
   },
 
   users(parent, args, ctx, info) {
-    const id = getUserId(ctx)
     return ctx.db.query.users(args, info)
   }
 }

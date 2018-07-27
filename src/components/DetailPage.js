@@ -5,15 +5,16 @@ import  { gql } from 'apollo-boost'
 
 class DetailPage extends Component {
   render() {
-    if (this.props.gameQuery.loading) {
+    if (this.props.gameQuery.loading || this.props.meQuery.loading) {
       return (
         <div className="flex w-100 h-100 items-center justify-center pt7">
-          <div>Loading (from {process.env.REACT_APP_GRAPHQL_ENDPOINT})</div>
+          <div>Loading game...</div>
         </div>
       )
     }
 
     const { game } = this.props.gameQuery
+    const { me } = this.props.meQuery
     
     let action = this._renderAction(game)
     let createDate = new Date(game.createdAt)
@@ -26,7 +27,10 @@ class DetailPage extends Component {
           <p className="black-80 fw3">{'Finished at ' + updatedDate.toLocaleTimeString()}</p>
         )}
         <br />
-        {!game.winner ? action : null}
+        {!game.winner && ((game.players.filter(player => player.id === me.id).length > 0)) ? action : null}
+        {game.winner && (
+          <h4>Winner is: {game.winner.name}</h4>
+        )}
       </Fragment>
     )
   }
@@ -74,6 +78,16 @@ class DetailPage extends Component {
   }
 }
 
+const ME_QUERY = gql`
+  query MeQuery {
+    me {
+      id
+      email
+      name
+    }
+  }
+`
+
 const GAME_QUERY = gql`
   query GameQuery($id: ID!) {
     game(id: $id) {
@@ -111,6 +125,9 @@ const DELETE_MUTATION = gql`
 `
 
 export default compose(
+  graphql(ME_QUERY, {
+    name: 'meQuery'
+  }),
   graphql(GAME_QUERY, {
     name: 'gameQuery',
     options: props => ({

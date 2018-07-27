@@ -26,7 +26,7 @@ class LeaderboardsPage extends Component {
     if (this.props.usersQuery.loading) {
       return (
         <div className="flex w-100 h-100 items-center justify-center pt7">
-          <div>Loading (from {process.env.REACT_APP_GRAPHQL_ENDPOINT})</div>
+          <div>Loading rankings...</div>
         </div>
       )
     }
