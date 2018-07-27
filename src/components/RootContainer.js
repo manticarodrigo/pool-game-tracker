@@ -117,20 +117,15 @@ class RootContainer extends Component {
         >
           Games
         </NavLink>
-        {this.props.data &&
-          this.props.data.me &&
-          this.props.data.me.email &&
-          this.state.token && (
-            <NavLink
-              className="link dim f6 f5-ns dib mr3 black"
-              activeClassName="gray"
-              exact={true}
-              to="/leaderboards"
-              title="Leaderboards"
-            >
-              Leaderboards
-            </NavLink>
-        )}
+        <NavLink
+          className="link dim f6 f5-ns dib mr3 black"
+          activeClassName="gray"
+          exact={true}
+          to="/leaderboards"
+          title="Leaderboards"
+        >
+          Leaderboards
+        </NavLink>
         <NavLink
           className="link dim f6 f5-ns dib mr3 black"
           activeClassName="gray"
@@ -182,12 +177,12 @@ class RootContainer extends Component {
         <Switch>
           <Route exact path="/" component={GamesPage} />
           <Route exact path="/about" component={AboutPage} />
-          <ProtectedRoute
+          <Route
             token={this.state.token}
             path="/leaderboards"
             component={LeaderboardsPage}
           />
-          <ProtectedRoute
+          <Route
             token={this.state.token}
             path="/create"
             component={CreatePage}

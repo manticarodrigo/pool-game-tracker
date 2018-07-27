@@ -58,12 +58,12 @@ class SignupPage extends Component {
 
   _signup = async e => {
     e.preventDefault()
-    const { email, name, password } = this.state
+    const { email, password, name } = this.state
     const result = await this.props.signupMutation({
       variables: {
-        name,
         email,
         password,
+        name,
       },
     })
 
