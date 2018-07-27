@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import {
   NavLink,
   Link,
-  BrowserRouter as Router,
+  HashRouter as Router,
   Route,
   Switch,
   Redirect,

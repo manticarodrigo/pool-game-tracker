@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 import { AUTH_TOKEN } from '../constant'
+
 
 class LoginPage extends Component {
   state = {
@@ -15,7 +16,7 @@ class LoginPage extends Component {
       <div className="pa4 flex justify-center bg-white">
         <div>
           <h3>
-            Don't have an account? <a href="/signup">Signup</a>
+            Don't have an account? <Link to="/signup">Signup</Link>
           </h3>
           <input
             autoFocus
