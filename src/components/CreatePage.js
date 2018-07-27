@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { graphql, compose } from 'react-apollo'
+import { Query, graphql, compose } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class CreatePage extends Component {
@@ -18,6 +18,9 @@ class CreatePage extends Component {
   }
 
   render() {
+    const users = this.props.usersQuery.users
+    const reference = users ? JSON.parse(JSON.stringify(users)) : null
+    const otherUsers = users ? reference.filter(user => user.id !== this.props.meQuery.me.id) : null
     return (
       <div className="pa4 flex justify-center bg-white">
         <form onSubmit={this.handleSubmit}>
@@ -35,17 +38,19 @@ class CreatePage extends Component {
             <option>{this.props.meQuery.me ? this.props.meQuery.me.name : 'No current user found.'}</option>
           </select>
           <p><strong>Player 2</strong></p>
-          <select
-            value={this.state.opponent}
-            onChange={e => this.setState({ opponent: e.target.value })}
-          >
-            {this.props.usersQuery.users &&
-              this.props.usersQuery.users.map(user => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
+          {this.props.meQuery.me && (
+            <select
+              value={this.state.opponent}
+              onChange={e => this.setState({ opponent: e.target.value })}
+            >
+              {this.props.usersQuery.users &&
+                otherUsers.map(user => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+              ))}
+            </select>
+          )}
           <p>
             <input
               style={{ marginRight: '1em'}}
@@ -85,7 +90,6 @@ const ME_QUERY = gql`
     }
   }
 `
-
 const USERS_QUERY = gql`
   query UsersQuery {
     users {

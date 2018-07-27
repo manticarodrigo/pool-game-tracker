@@ -6,7 +6,6 @@ class LeaderboardsPage extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.key !== this.props.location.key) {
-      this.props.meQuert.refetch()
       this.props.usersQuery.refetch()
     }
   }
@@ -23,7 +22,6 @@ class LeaderboardsPage extends Component {
   render() {
     const users = this.props.usersQuery.users
     const reference = users ? JSON.parse(JSON.stringify(users)) : null
-    if (users) { reference.push(this.props.meQuery.me) }
     const rankedUsers = users ? reference.sort(this.compare) : null
     if (this.props.usersQuery.loading) {
       return (
@@ -50,20 +48,6 @@ class LeaderboardsPage extends Component {
   }
 }
 
-const ME_QUERY = gql`
-  query MeQuery {
-    me {
-      id
-      email
-      name
-      gamesWon {
-        id
-        title
-      }
-    }
-  }
-`
-
 const USERS_QUERY = gql`
   query UsersQuery {
     users {
@@ -78,11 +62,52 @@ const USERS_QUERY = gql`
   }
 `
 
+const USERS_SUBSCRIPTION = gql`
+  subscription GamesSubscription {
+    gamesSubscription {
+      node {
+        id
+        title
+        players {
+          id
+          email
+          name
+        }
+        winner {
+          id
+          email
+          name
+        }
+      }
+    }
+  }
+`
+
 export default compose(
-  graphql(ME_QUERY, {
-    name: 'meQuery'
-  }),
   graphql(USERS_QUERY, {
-    name: 'usersQuery'
-  }),
+    name: 'usersQuery',
+    options: {
+    fetchPolicy: 'network-only',
+  },
+  props: props =>
+    Object.assign({}, props, {
+      subscribeToNewGames: params => {
+        return props.usersQuery.subscribeToMore({
+          document: USERS_SUBSCRIPTION,
+          updateQuery: (prev, { subscriptionData }) => {
+            if (!subscriptionData.data) {
+              return prev
+            }
+            const newUser = subscriptionData.data.userSubscription.node
+            if (prev.users.find(user => user.id === newUser.id)) {
+              return prev
+            }
+            return Object.assign({}, prev, {
+              users: [...prev.users, newUser],
+            })
+          },
+        })
+      },
+    }),
+  })
 )(LeaderboardsPage)

@@ -17,6 +17,7 @@ type Mutation {
 
 type Subscription {
   gamesSubscription: GameSubscriptionPayload!
+  usersSubscription: UserSubscriptionPayload!
 }
 
 type AuthPayload {

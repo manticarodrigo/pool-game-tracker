@@ -70,7 +70,7 @@ class DetailPage extends Component {
     await this.props.chooseWinner({
       variables: { id, winnerId },
     })
-    this.props.history.replace('/')
+    this.props.history.replace('/leaderboards')
   }
 }
 

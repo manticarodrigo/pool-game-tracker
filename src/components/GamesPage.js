@@ -71,6 +71,7 @@ const GAMES_QUERY = gql`
     }
   }
 `
+
 const GAMES_SUBSCRIPTION = gql`
   subscription GamesSubscription {
     gamesSubscription {

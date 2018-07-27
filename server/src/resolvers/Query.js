@@ -16,7 +16,7 @@ const Query = {
 
   users(parent, args, ctx, info) {
     const id = getUserId(ctx)
-    return ctx.db.query.users({ where : { id_not: id } }, info)
+    return ctx.db.query.users(args, info)
   }
 }
 
