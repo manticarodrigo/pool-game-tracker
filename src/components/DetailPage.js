@@ -27,7 +27,7 @@ class DetailPage extends Component {
           <p className="black-80 fw3">{'Finished at ' + updatedDate.toLocaleTimeString()}</p>
         )}
         <br />
-        {!game.winner && ((game.players.filter(player => player.id === me.id).length > 0)) ? action : null}
+        {!game.winner && (me && (game.players.filter(player => player.id === me.id).length > 0)) ? action : null}
         {game.winner && (
           <h4>Winner is: {game.winner.name}</h4>
         )}
