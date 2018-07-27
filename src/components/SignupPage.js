@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 import { AUTH_TOKEN } from '../constant'
@@ -16,7 +16,7 @@ class SignupPage extends Component {
       <div className="pa4 flex justify-center bg-white">
         <form onSubmit={this._signup}>
           <h3>
-            Already have an account!!! <a href="/login"> Login</a>
+            Already have an account!!! <Link to="/login"> Login</Link>
           </h3>
           <input
             autoFocus
