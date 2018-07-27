@@ -4,14 +4,27 @@ import { graphql } from 'react-apollo'
 import  { gql } from 'apollo-boost'
 
 class LeaderboardsPage extends Component {
-  componentWillReceiveProps(nextProps) {
-    if (this.props.location.key !== nextProps.location.key) {
-      this.props.draftsQuery.refetch()
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.location.key !== this.props.location.key) {
+      this.props.usersQuery.refetch()
     }
   }
 
+  compare = (a,b) => {
+    if (a.gamesWon.length > b.gamesWon.length) {
+      return -1
+    } else if (b.gamesWon.length > a.gamesWon.length) {
+      return 1
+    }
+    return 0
+ }
+
   render() {
-    if (this.props.draftsQuery.loading) {
+    const users = this.props.usersQuery.users
+    const reference = users ? JSON.parse(JSON.stringify(users)) : null
+    const rankedUsers = users ? reference.sort(this.compare) : null
+    if (this.props.usersQuery.loading) {
       return (
         <div className="flex w-100 h-100 items-center justify-center pt7">
           <div>Loading (from {process.env.REACT_APP_GRAPHQL_ENDPOINT})</div>
@@ -22,16 +35,13 @@ class LeaderboardsPage extends Component {
     return (
       <Fragment>
         <div className="flex justify-between items-center">
-          <h1>Drafts</h1>
+          <h1>Leaderboards</h1>
         </div>
-        {this.props.draftsQuery.drafts &&
-          this.props.draftsQuery.drafts.map(draft => (
-            <Game
-              key={draft.id}
-              game={draft}
-              refresh={() => this.props.draftsQuery.refetch()}
-              isDraft={!draft.isPublished}
-            />
+        {rankedUsers &&
+          rankedUsers.map(user => (
+            <p key={user.id}>
+              {user.name} has won {user.gamesWon.length} game(s).
+            </p>
           ))}
         {this.props.children}
       </Fragment>
@@ -39,22 +49,22 @@ class LeaderboardsPage extends Component {
   }
 }
 
-const DRAFTS_QUERY = gql`
-  query DraftsQuery {
-    drafts {
+const USERS_QUERY = gql`
+  query UsersQuery {
+    users {
       id
-      text
-      title
-      isPublished
-      author {
-        name
+      email
+      name
+      gamesWon {
+        id
+        title
       }
     }
   }
 `
 
-export default graphql(DRAFTS_QUERY, {
-  name: 'draftsQuery', // name of the injected prop: this.props.feedQuery...
+export default graphql(USERS_QUERY, {
+  name: 'usersQuery', // name of the injected prop: this.props.feedQuery...
   options: {
     fetchPolicy: 'network-only',
   },
