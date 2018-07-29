@@ -7,7 +7,7 @@ setInterval(function() {
     console.log('ping')
     https.get('https://pool-game-tracker.herokuapp.com/')
     https.get('https://pool-game-tracker-graphql.herokuapp.com/heroku/demo')
-}, 150000) // every 5 minutes (300000)
+}, 1500000) // every 5 minutes (300000)
 
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
