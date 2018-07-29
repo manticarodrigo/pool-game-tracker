@@ -1,12 +1,12 @@
 const { GraphQLServer } = require('graphql-yoga')
 const { Prisma } = require('prisma-binding')
 const resolvers = require('./resolvers')
-var http = require('http')
+var https = require('https')
 
 setInterval(function() {
     console.log('ping')
-    http.get('https://pool-game-tracker.herokuapp.com/')
-    http.get('https://pool-game-tracker-graphql.herokuapp.com/heroku/demo')
+    https.get('https://pool-game-tracker.herokuapp.com/')
+    https.get('https://pool-game-tracker-graphql.herokuapp.com/heroku/demo')
 }, 150000) // every 5 minutes (300000)
 
 const server = new GraphQLServer({
