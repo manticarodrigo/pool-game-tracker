@@ -23,14 +23,6 @@ import  { gql } from 'apollo-boost'
 
 import Logo from '../assets/pool-logo.png'
 
-const ProtectedRoute = ({ component: Component, token, ...rest }) => {
-  return token ? (
-    <Route {...rest} render={matchProps => <Component {...matchProps} />} />
-  ) : (
-    <Redirect to="/login" />
-  )
-}
-
 class RootContainer extends Component {
   constructor(props) {
     super(props)

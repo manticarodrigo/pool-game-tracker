@@ -1,13 +1,8 @@
+require('dotenv').load()
+
 const { GraphQLServer } = require('graphql-yoga')
 const { Prisma } = require('prisma-binding')
 const resolvers = require('./resolvers')
-var https = require('https')
-
-// setInterval(function() {
-//     console.log('ping')
-//     https.get('https://pool-game-tracker.herokuapp.com/')
-//     https.get('https://pool-game-tracker-graphql.herokuapp.com/heroku/demo')
-// }, 1500000) // every 5 minutes (300000)
 
 const server = new GraphQLServer({
   typeDefs: './src/schema.graphql',
@@ -17,7 +12,7 @@ const server = new GraphQLServer({
     db: new Prisma({
       typeDefs: 'src/generated/prisma.graphql', // the auto-generated GraphQL schema of the Prisma API
       endpoint: process.env.PRISMA_ENDPOINT, // the endpoint of the Prisma API (value set in `.env`)
-      // secret: process.env.PRISMA_SECRET, // only needed if specified in `database/prisma.yml` (value set in `.env`)
+      secret: process.env.PRISMA_SECRET, // only needed if specified in `database/prisma.yml` (value set in `.env`)
       debug: true, // log all GraphQL queries & mutations sent to the Prisma API
     }),
   }),

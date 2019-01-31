@@ -20,7 +20,7 @@ class CreatePage extends Component {
   render() {
     const users = this.props.usersQuery.users
     const reference = users ? JSON.parse(JSON.stringify(users)) : null
-    const otherUsers = users ? reference.filter(user => user.id !== this.props.meQuery.me.id) : null
+    const otherUsers = users ? reference.filter(user => user.id !== (this.props.meQuery.me || {}).id) : null
     return (
       <div className="pa4 flex justify-center bg-white">
         <form onSubmit={this.handleSubmit}>
